@@ -46,7 +46,8 @@ summary(wineData)
 
 # For each column, it returns the minimum value, 1st quantile, 
 # median, mean, 3rd quantile and the maximum value
-# Providing us with the spread and distribution of the variables
+# Providing us with the spread, distribution and central 
+# tendency of the variables
 
 # ---------------------------------------------------------
 # Visulisation of the dataset
@@ -206,7 +207,9 @@ summary(lmFit5)
 # ---------------------------------------------------------
 # Checking for Non-linear Relations with Variables
 
-# plotting Quality vs all the remaining variables
+# Plotting Quality vs all the remaining variables 
+# individually to try and better understand and detect 
+# non-linearity
 plot(wineData$VolatileAcidity, wineData$Quality, pch = 19, col = "blue")
 plot(wineData$Chlorides, wineData$Quality, pch = 19, col = "blue")
 plot(wineData$FreeSulphurDioxide, wineData$Quality, pch = 19, col = "blue")
@@ -215,14 +218,26 @@ plot(wineData$pH, wineData$Quality, pch = 19, col = "blue")
 plot(wineData$Sulphates, wineData$Quality, pch = 19, col = "blue")
 plot(wineData$Alcohol, wineData$Quality, pch = 19, col = "blue")
 
+# Most of the plots show no non-linearity, except for sulphates
+# which is unclear and ambiguous on its nonlinearity
 
 # Fitting the linear model on Quality vs remaining variables but
 # introducing non-linear term as per observations above
+
 # Model 6.
 lmFit6 <- update(lmFit5, ~ . + I(Sulphates^2), data = wineData)
 
 # Display the summary of the updated linear model
 summary(lmFit6)
+
+# With addition of an independant variable (sulphates)^2 in
+# Model 6, we could see that the doubt was indeed correct and
+# the variable is useful and highly significant in predicting
+# Quality. It helped improve the R-squared to 0.3640 from 0.3423
+
+# We now further look to eliminate the least significant variables.
+# We can see that FreeSulphurDioxide has lost its significance due 
+# the presence of the new variable, that absorbed its contribution.
 
 # Linear Model 6 minus FreeSulphurDioxide
 # Model 7.
@@ -231,12 +246,22 @@ lmFit7 <- update(lmFit6, ~ . - FreeSulphurDioxide, data = wineData)
 # Display the summary of the updated linear model
 summary(lmFit7)
 
+# The elimination of FreeSulphurDioxide decreased the R-squared to
+# 0.363 from 0.364 but it increased the F-statistic and Degrees of 
+# Freedom, hence proved useful.
+# We now aim to keep only variables that have high significance (***)
+# in our model and hence look to eliminate TotalSulphurDioxide.
+
 # Linear Model 6 minus FreeSulphurDioxide, TotalSulphurDioxide
 # Model 8.
 lmFit8 <- update(lmFit7, ~ . - TotalSulphurDioxide, data = wineData)
 
 # Display the summary of the updated linear model
 summary(lmFit8)
+
+# As seen earlier the elimination of TotalSulphurDioxide also 
+# decreased the R-squared to 0.3602 from 0.363 but resulted in 
+# an increase in F-statistic and Degrees of Freedom
 
 # 13b : check the model for potential outliers
 plot(lmFit8)
