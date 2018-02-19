@@ -67,6 +67,8 @@ hist(carData$horsepower, col = "lightgreen")
 hist(carData$weight, col = "lightgreen")
 hist(carData$acceleration, col = "lightgreen")
 hist(carData$mpg, col = "lightgreen")
+# Most of the plots show a right skewed distribution while others
+# show normal distribution
 
 # Boxplots of all individual variables
 # checking correspondence with summary statistics
@@ -76,6 +78,10 @@ boxplot(carData$horsepower, horizontal = TRUE, col = "steelblue")
 boxplot(carData$weight, horizontal = TRUE, col = "steelblue")
 boxplot(carData$acceleration, horizontal = TRUE, col = "steelblue")
 boxplot(carData$mpg, horizontal = TRUE, col = "steelblue")
+# Box plots were able to clearly point out potential outliers 
+# and provide a better sense on where the median or mean lie
+# hence improving our understanding of the frequency histograms
+# and the entire dataset
 
 # ---------------------------------------------------------
 # Checking correlations between variables
@@ -83,13 +89,45 @@ cor(carData)
 # install.packages("corrplot")
 library(corrplot)
 corrplot.mixed(cor(carData))
+# corrplot library uses colours and shape to visual represent
+# the strength of the correlations in a matrix format
+
+# With the correlation matrix, we find that mpg has strong 
+# correlation with all the variables.
+# The strongest correlations being with weight (-0.84) and 
+# displacement (-0.81)
+# Low or zero correlated variable will be least significant 
+# and would be eliminated early to create the best model
+
+# The highest correlation(0.90-0.95) found was betwen 
+# cylinder & displacement,
+# displacement & weight,
+# cylinder & weight,
+# Hence these variables are likely to absorb each others
+# contribution to mpg and may cause them to be futile
+# in predicting mpg
 
 # ---------------------------------------------------------
 # Plot 2d scatterplots of all pairs of variables
 pairs(carData, pch = 19, col = "blue")
+# Viewing the scatter plots we can understand why the correlation
+# of the various variable pairs are either high or low
+# We can quickly understand how exactly the linearly related
+# mpg is to the other variables
+
+# The scatter plot between acceleration and mpg is more linear
+# less spherical indicating a good correlation between them
+# For displacement, horsepower and weight; we find that mpg
+# has some what of a non-linear relation.
+# These variables also have a non-linear relation amongst
+# themselves, hence we can find the possibility of an 
+# interactions between them too.
 
 # ---------------------------------------------------------
 # Perform Linear Regression (mpg vs rest of the variables)
+
+# We will use adjusted R-squared as the metric to determine
+# if the model has improved
 
 # Linear model on mpg vs Rest of the variables
 # Model 1. - Full Model
@@ -98,16 +136,42 @@ lmFit1 <- lm(mpg ~ ., data = carData)
 # Display the summary of Model 1.
 summary(lmFit1)
 
+# The "Full Model" summary statistics provide us with information
+# on the formula, residuals, and coefficients.
+# The coefficients provide a scale of significance on each of
+# the variables that provide a contribution on predicting the mpg.
+
+# We see that only weight shows high significance while horsepower
+# display low significance. This is probably due the fact that
+# weight is proved to be independant of other variables and most 
+# other variables have their contribution absorbed by either 
+# horsepower or weight.
+
 # ---------------------------------------------------------
 # Building an Updated Model by removing the least significant 
 # variable at a time
 
+# To do so, we would want to eliminate the most insignificant
+# variables having "." or lesser on the scale.
+# With variables having the same significance, we will use 
+# Probability (Pr) to decide
+
+# The value in the Pr colum informs us of the probability of 
+# coefficient of the variable to go to zero. The higher the 
+# probability the lower its significance.
+
 # Linear Model on mpg vs Rest minus acceleration
 # Model 2.
+
 lmFit2 <- update(lmFit1, ~ . - acceleration, data = carData)
 
 # Display the summary of the updated linear model
 summary(lmFit2)
+# In Model 2,  we removed the variable acceleration (Pr = 0.82) 
+# as it was the least significant and has the highest probability
+# of the coefficient going to zero, amongst other variables.
+# This helped improve the R-squared to 0.7118 from 0.7127 and also
+# increased horsepowers significance as its contribution increased.
 
 # Linear Model on mpg vs Rest minus acceleration, cylinders
 # Model 3.
@@ -115,6 +179,12 @@ lmFit3 <- update(lmFit2, ~ . - cylinders, data = carData)
 
 # Display the summary of the updated linear model
 summary(lmFit3)
+
+# Similarly in Model 3, we removed the variable cylinders 
+# (Pr = 0.64) This helped improve the R-squared to
+# 0.7127 from 0.7134. cylinder proved not have any correlation
+# with weight at all, also didnt effect significance of any other
+# variable. Positively helping the degree of freedom and F-statistic
 
 # Linear Model on mpg vs Rest minus acceleration, cylinders
 # displacement
@@ -124,8 +194,19 @@ lmFit4 <- update(lmFit3, ~ . - displacement, data = carData)
 # Display the summary of the updated linear model
 summary(lmFit4)
 
+# Similarly in Model 4, we removed the variable displacement
+# (Pr = 0.21). Here we see a negligible loss in R-squared.
+# But helped increase horsepower's significance to most 
+# significant. Also increased degree of freedom and F-statistic
+
+# Now we have covered the linearity part of the model 
+# and kept only the variables that have a significance of 
+# Pr lower than 0.05 (*). Although, all our variables are
+# already highly significant
+
 # ---------------------------------------------------------
 # Checking for Non-linear Relations with Variables
+
 
 # plotting mpg vs all the remaining variables
 plot(carData$horsepower, carData$mpg, pch = 19, col = "blue")
