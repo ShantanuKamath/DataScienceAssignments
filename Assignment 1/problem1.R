@@ -61,35 +61,35 @@ summary(wineData)
 
 # Viewing histograms of individual variables to understand 
 # its distribution shape, center, range and variation
-hist(wineData$FixedAcidity, col = "lightgreen")
-hist(wineData$VolatileAcidity, col = "lightgreen")
-hist(wineData$CitricAcid, col = "lightgreen")
-hist(wineData$ResidualSugar, col = "lightgreen")
-hist(wineData$Chlorides, col = "lightgreen")
-hist(wineData$FreeSulphurDioxide, col = "lightgreen")
-hist(wineData$TotalSulphurDioxide, col = "lightgreen")
-hist(wineData$Density, col = "lightgreen")
-hist(wineData$pH, col = "lightgreen")
-hist(wineData$Sulphates, col = "lightgreen")
-hist(wineData$Alcohol, col = "lightgreen")
-hist(wineData$Quality, col = "lightgreen")
+hist(wineData$FixedAcidity, col = "red")
+hist(wineData$VolatileAcidity, col = "yellow")
+hist(wineData$CitricAcid, col = "green")
+hist(wineData$ResidualSugar, col = "purple")
+hist(wineData$Chlorides, col = "orange")
+hist(wineData$FreeSulphurDioxide, col = "cyan")
+hist(wineData$TotalSulphurDioxide, col = "red")
+hist(wineData$Density, col = "yellow")
+hist(wineData$pH, col = "green")
+hist(wineData$Sulphates, col = "purple")
+hist(wineData$Alcohol, col = "orange")
+hist(wineData$Quality, col = "cyan")
 # Most of the plots show a normal distribution while others
 # show right skewed distribution
 
 # Boxplots of all individual variables
 # checking correspondence with summary statistics
-boxplot(wineData$FixedAcidity , horizontal = TRUE, col = "steelblue")
-boxplot(wineData$VolatileAcidity, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$CitricAcid, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$ResidualSugar, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$Chlorides, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$FreeSulphurDioxide, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$TotalSulphurDioxide, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$Density, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$pH, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$Sulphates, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$Alcohol, horizontal = TRUE, col = "steelblue")
-boxplot(wineData$Quality, horizontal = TRUE, col = "steelblue")
+boxplot(wineData$FixedAcidity , horizontal = TRUE, col = "red")
+boxplot(wineData$VolatileAcidity, horizontal = TRUE, col = "yellow")
+boxplot(wineData$CitricAcid, horizontal = TRUE, col = "green")
+boxplot(wineData$ResidualSugar, horizontal = TRUE, col = "purple")
+boxplot(wineData$Chlorides, horizontal = TRUE, col = "orange")
+boxplot(wineData$FreeSulphurDioxide, horizontal = TRUE, col = "cyan")
+boxplot(wineData$TotalSulphurDioxide, horizontal = TRUE, col = "pink")
+boxplot(wineData$Density, horizontal = TRUE, col = "red")
+boxplot(wineData$pH, horizontal = TRUE, col = "yellow")
+boxplot(wineData$Sulphates, horizontal = TRUE, col = "green")
+boxplot(wineData$Alcohol, horizontal = TRUE, col = "purple")
+boxplot(wineData$Quality, horizontal = TRUE, col = "orange")
 # Box plots were able to clearly point out potential outliers 
 # and provide a better sense on where the median or mean lie
 # hence improving our understanding of the frequency histograms
@@ -105,7 +105,7 @@ corrplot.mixed(cor(wineData))
 # corrplot library uses colours and shape to visual represent
 # the strength of the correlations in a matrix format
 
-# With the correlation matrix, we find that "Quality" doesnot 
+# With the correlation matrix, we find that "Quality" doesn't 
 # have a very strong correlation with any of the variables.
 # The most correlation being with Alcohol (0.47) and 
 # VolatileAcidity (-0.39)
@@ -123,11 +123,11 @@ corrplot.mixed(cor(wineData))
 
 # ---------------------------------------------------------
 # Plotting two-dimensional scatterplots of all pairs of variables
-pairs(wineData, pch = 19, col = "blue")
+pairs(wineData, pch = 19, col = "orange")
 # Viewing the scatter plots we can understand why the correlation
 # of the various variable pairs are either high or low
 # It is difficult to judge the plots that involve Quality because
-# its type is integer and more discrete than continuous.
+# its type is integer and more discrete in nature
 
 # The scatter plot between sulphate and Quality seem to be less 
 # spherical and hence point towards some linearity/nonlinearity
@@ -136,8 +136,12 @@ pairs(wineData, pch = 19, col = "blue")
 # ---------------------------------------------------------
 # Perform Linear Regression (Quality vs rest of the variables)
 
-# We will use adjusted R-squared as the metric to determine
-# if the model is improving
+# We will use Adjusted R-squared as the metric to determine
+# if the model is improving. As during removal of a unsignificant
+# variable, Multiple R-squared might not increase but adjusted will.
+# Same during adding a unsignificant variable. Multiple R-squared will
+# increase but adjusted may not. This is due to the fact that adjusted 
+# R-squared takes into consideration the number of variables being used
 
 # Linear model on Quality vs Rest of the variables
 # Model 1. - Full Model
@@ -174,7 +178,7 @@ summary(lmFit2)
 # In Model 2,  we removed the variable FixedAcidity (Pr = 0.76) 
 # as it was the least significant and has the highest probability
 # of the coefficient going to zero, amongst other variables.
-# This helped improve the R-squared to 0.3413 from 0.3407
+# This helped improve the adjusted R-squared to 0.3413 from 0.3407
 
 # Linear Model on Quality vs Rest minus FixedAcidity, CitricAcid
 # Model 3.
@@ -218,30 +222,29 @@ summary(lmFit5)
 # Plotting Quality vs all the remaining variables 
 # individually to try and better understand and detect 
 # non-linearity
-plot(wineData$VolatileAcidity, wineData$Quality, pch = 19, col = "blue")
-plot(wineData$Chlorides, wineData$Quality, pch = 19, col = "blue")
-plot(wineData$FreeSulphurDioxide, wineData$Quality, pch = 19, col = "blue")
+plot(wineData$VolatileAcidity, wineData$Quality, pch = 19, col = "red")
+plot(wineData$Chlorides, wineData$Quality, pch = 19, col = "yellow")
+plot(wineData$FreeSulphurDioxide, wineData$Quality, pch = 19, col = "green")
 plot(wineData$TotalSulphurDioxide, wineData$Quality, pch = 19, col = "blue")
-plot(wineData$pH, wineData$Quality, pch = 19, col = "blue")
-plot(wineData$Sulphates, wineData$Quality, pch = 19, col = "blue")
-plot(wineData$Alcohol, wineData$Quality, pch = 19, col = "blue")
+plot(wineData$pH, wineData$Quality, pch = 19, col = "orange")
+plot(wineData$Sulphates, wineData$Quality, pch = 19, col = "purple")
+plot(wineData$Alcohol, wineData$Quality, pch = 19, col = "cyan")
 
 # Most of the plots show no non-linearity, except for sulphates
 # which is unclear and ambiguous on its nonlinearity
 
 # Fitting the linear model on Quality vs remaining variables but
-# introducing non-linear term as per observations above
-
+# introducing non-linear term Sulphates^2
 # Model 6.
 lmFit6 <- update(lmFit5, ~ . + I(Sulphates^2), data = wineData)
 
 # Display the summary of the updated linear model
 summary(lmFit6)
 
-# With addition of an independant variable (sulphates)^2 in
+# With addition of an independant variable (Sulphates)^2 in
 # Model 6, we could see that the doubt was indeed correct and
 # the variable is useful and highly significant in predicting
-# Quality. It helped improve the R-squared to 0.3640 from 0.3423
+# Quality. It helped improve the adjsted R-squared to 0.3640 from 0.3423
 
 # We now further look to eliminate the least significant variables.
 # We can see that FreeSulphurDioxide has lost its significance due 
@@ -257,6 +260,7 @@ summary(lmFit7)
 # The elimination of FreeSulphurDioxide decreased the R-squared to
 # 0.363 from 0.364 but it increased the F-statistic and Degrees of 
 # Freedom, hence proved useful.
+
 # We now aim to keep only variables that have high significance (***)
 # in our model and hence look to eliminate TotalSulphurDioxide.
 
