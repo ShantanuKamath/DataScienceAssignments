@@ -207,37 +207,78 @@ summary(lmFit4)
 # ---------------------------------------------------------
 # Checking for Non-linear Relations with Variables
 
-
-# plotting mpg vs all the remaining variables
+# Plotting mpg vs all the remaining variables 
+# individually to try and better understand and detect 
+# non-linearity
 plot(carData$horsepower, carData$mpg, pch = 19, col = "blue")
 plot(carData$weight, carData$mpg, pch = 19, col = "blue")
+# Both variables show a prominent non-linearity with the
+# mpg variable and can be used as independant variables.
+
 
 # Fitting the linear model on mpg vs remaining variables but
-# introducing non-linear term as per observations above
+# introducing non-linear term weight^2
 # Model 5.
 lmFit5 <- update(lmFit4, ~ . + I(weight^2), data = carData)
 
 # Display the summary of the updated linear model
 summary(lmFit5)
 
+# With addition of an independant variable (weight)^2 in
+# Model 5, we can see that the R-squared has improved from
+# 0.7129 to 0.746. The new variable has high significance and 
+# confirmed its non-linear relation as seen in the plots before.
+# No variable lost its significant showing that this provided 
+# a new contribution.
+
+# Updating the model 5 by introducing non-linear term horsepower^
 # Model 6.
 lmFit6 <- update(lmFit5, ~ . + I(horsepower^2), data = carData)
 
 # Display the summary of the updated linear model
 summary(lmFit6)
 
+# With addition of an independant variable (horsepower)^2 in
+# Model 6, we can see that the R-squared has improved from
+# 0.746 to 0.7546. The new variable has high significance and 
+# confirmed its non-linear relation as seen in the plots before.
+# No variable lost its significant showing that this provided 
+# a new contribution.
+
+# Updating the model 6 by introducing interaction term 
+# horsepower:weight
 # Model 7.
 lmFit7 <- update(lmFit6, ~ . + horsepower:weight, data = carData)
 
 # Display the summary of the updated linear model
 summary(lmFit7)
 
-# Linear Model 7 minus FreeSulphurDioxide
+# Seeing that both these variables have a non-linear relation
+# with mpg. It make sense to check if the two variables themselves
+# can provide a useful contribution through interaction
+
+# With addition of the interaction horsepower:weight in
+# Model 7, we can see that the R-squared has improved from
+# 0.7546 yo 0.7553. Both independant variables lost their 
+# significance along with the low significance of this interaction.
+# Hence now we seem to realise that the interaction actually 
+# absorbed the contribution of both variables and the probability 
+# of the coefficient going to zero increased significantly.
+
+# Linear Model 7 minus weight^2
 # Model 8.
 lmFit8 <- update(lmFit7, ~ . - I(weight^2), data = carData)
 
 # Display the summary of the updated linear model
 summary(lmFit8)
+
+# As mention above, weight^2 (Pr = 0.72) lost its importance
+# as the interaction absorbed its contribution.
+# As it was the least significant and has the highest probability
+# of the coefficient going to zero, amongst other variables.
+# This helped improve the R-squared to 0.7561 from 0.7553
+# As seen, the significance of the interaction variable increased 
+# to the highest significance category
 
 # Model 9.
 lmFit9 <- update(lmFit8, ~ . - I(horsepower^2), data = carData)
@@ -245,7 +286,16 @@ lmFit9 <- update(lmFit8, ~ . - I(horsepower^2), data = carData)
 # Display the summary of the updated linear model
 summary(lmFit9)
 
-# 13b : check the model for potential outliers
+# As mention above, horsepower^2 (Pr = 0.39) lost its importance
+# as the interaction absorbed its contribution.
+# As it was the least significant and has the highest probability
+# of the coefficient going to zero, amongst other variables.
+# This helped improve the R-squared to 0.7563 from 0.7561
+
+# ---------------------------------------------------------
+# Finding and removing outliers
+
+# Plotting to check the model for potential outliers
 plot(lmFit9)
 
 # 13c : remove outliers and high-leverage points
