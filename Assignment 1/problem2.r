@@ -7,37 +7,60 @@
 
 # Problem 2:
 # In this problem, our dataset is -- assign1_CarData.csv
+# The solution of the problem looks to fit an optimal linear
+# regression model to predict the mpg(Miles Per Gallon)
+# of the car
+
+# ---------------------------------------------------------
+# Clean environment and remove all working data
+
 rm(list = ls())
 
 # ---------------------------------------------------------
 # Importing the dataset Week04carData.csv
-carData <- read.csv("assign1_CarData.csv", header = TRUE)
 
+carData <- read.csv("assign1_CarData.csv", header = TRUE)
 
 # ---------------------------------------------------------
 # Performing some basic exploratory data analysis
 
 # Dimension of the dataset
 dim(carData)
+# Here we find that we have information of 300 instances 
+# of cars and there are 6 different variables that
+# describe it
 
 # Labels of the variables in the dataset
 names(carData)
+# It provides us the names of each of the 6 variables
 
 # Structure of the dataset
 str(carData)
+# We find that the data is stored in a "data.frame"
+# The variables vary between numeric and integer type
 
 # First few rows of the data
 head(carData)
-
 # Last few rows of the data
 tail(carData)
+# heads and tails provide a general idea in terms of 
+# the variables actual values and their magnitudes
 
 # Summary statistics for all variables
 summary(carData)
+# It returns a table with the results of the summary
+# function applied to each column in the data frame
+
+# For each column, it returns the minimum value, 1st quantile, 
+# median, mean, 3rd quantile and the maximum value
+# Providing us with the spread, distribution and central 
+# tendency of the variables
 
 # ---------------------------------------------------------
-# Viewing plots of individual variables and checking 
-# correspondence with summary statistics
+# Visulisation of the dataset
+
+# Viewing histograms of individual variables to understand 
+# its distribution shape, center, range and variation
 hist(carData$cylinders, col = "lightgreen")
 hist(carData$displacement, col = "lightgreen")
 hist(carData$horsepower, col = "lightgreen")
