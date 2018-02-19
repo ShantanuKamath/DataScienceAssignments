@@ -11,7 +11,13 @@
 # regression model to predict the "Quality" of the wine
 
 # ---------------------------------------------------------
+# Clean environment and remove all working data
+
+rm(list = ls())
+
+# ---------------------------------------------------------
 # Importing the dataset Week04wineData.csv as wineData
+
 wineData <- read.csv("assign1_WineData.csv", header = TRUE)
 
 # ---------------------------------------------------------
@@ -30,7 +36,8 @@ names(wineData)
 # Structure of the dataset
 str(wineData)
 # We find that the data is stored in a "data.frame"
-# All of the variable have numeric data type
+# Quality has integer data type while,
+# Rest of the variables have numeric data type
 
 # First few rows of the data
 head(wineData)
@@ -278,3 +285,4 @@ lmFit <- lm(formula(lmFit8), data = wineData.clean)
 # 13e : did the performance of the model improve?
 summary(lmFit)
 plot(lmFit)
+
