@@ -280,6 +280,7 @@ summary(lmFit8)
 # As seen, the significance of the interaction variable increased 
 # to the highest significance category
 
+# Linear Model 8 minus horsepower^2
 # Model 9.
 lmFit9 <- update(lmFit8, ~ . - I(horsepower^2), data = carData)
 
@@ -298,15 +299,17 @@ summary(lmFit9)
 # Plotting to check the model for potential outliers
 plot(lmFit9)
 
-# 13c : remove outliers and high-leverage points
+# Calculating cooks distance to find and remove outliers
+# as well as high-leverage points
 cd <- cooks.distance(lmFit9)
 carData.clean <- carData[abs(cd) < 4/nrow(carData), ]
 nrow(carData.clean)
 
-# 13d : fit your best model to the clean dataset
+# Viewing and confirming the parameters in the final model
 formula(lmFit9)
+# Fitting the "Best Model" with the cleaned data
 lmFit <- lm(formula(lmFit9), data = carData.clean)
 
-# 13e : did the performance of the model improve?
+# Evaluating to find increase in performance
 summary(lmFit)
 plot(lmFit)

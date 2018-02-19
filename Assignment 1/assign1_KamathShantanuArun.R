@@ -172,7 +172,8 @@ lmFit2 <- update(lmFit1, ~ . - FixedAcidity, data = wineData)
 summary(lmFit2)
 
 # In Model 2,  we removed the variable FixedAcidity (Pr = 0.76) 
-# as it was the least significant
+# as it was the least significant and has the highest probability
+# of the coefficient going to zero, amongst other variables.
 # This helped improve the R-squared to 0.3413 from 0.3407
 
 # Linear Model on Quality vs Rest minus FixedAcidity, CitricAcid
@@ -270,19 +271,24 @@ summary(lmFit8)
 # decreased the R-squared to 0.3602 from 0.363 but resulted in 
 # an increase in F-statistic and Degrees of Freedom
 
-# 13b : check the model for potential outliers
+# ---------------------------------------------------------
+# Finding and removing outliers
+
+# Plotting to check the model for potential outliers
 plot(lmFit8)
 
-# 13c : remove outliers and high-leverage points
+# Calculating cooks distance to find and remove outliers
+# as well as high-leverage points
 cd <- cooks.distance(lmFit8)
 wineData.clean <- wineData[abs(cd) < 4/nrow(wineData), ]
 nrow(wineData.clean)
 
-# 13d : fit your best model to the clean dataset
+# Viewing and confirming the parameters in the final model
 formula(lmFit8)
+# Fitting the "Best Model" with the cleaned data
 lmFit <- lm(formula(lmFit8), data = wineData.clean)
 
-# 13e : did the performance of the model improve?
+# Evaluating to find increase in performance
 summary(lmFit)
 plot(lmFit)
 
