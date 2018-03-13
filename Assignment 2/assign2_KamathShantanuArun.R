@@ -7,8 +7,9 @@
 
 # Problem 1:
 # In this problem, our dataset is -- assign2_ChurnData.csv
-# The target is to fit an optimal tree model and a random 
-# forest to predict the chance of "Churn".
+# The target is to fit an optimal tree model with cross-
+# validation and a random forest model to predict the 
+# output "Churn".
 
 # ---------------------------------------------------------
 # Clean environment and remove all working data
@@ -25,13 +26,6 @@ names(churnData)    # labels of the columns/variables
 str(churnData)      # structure of the dataset
 head(churnData)     # first few (6) rows of the data
 tail(churnData)     # last few (6) rows of the data
-summary(churnData)  # summary statistics for all variables
-
-# In the summary details, It was found that the variable
-# TotalCharges has some missing values marked as NA
-# Removing those rows from the dataset
-churnData = churnData[complete.cases(churnData), ]
-dim(churnData)      # dimension of the dataset
 summary(churnData)  # summary statistics for all variables
 
 # Basic visualization of the label
@@ -96,27 +90,30 @@ plot(churnData$MonthlyCharges, churnData$TotalCharges,
      pch = 19, col = cols[as.numeric(churnData$Churn)])
 
 # =======================================================
-# Tree Model : Building a Classification Tree
+# Building the Default Tree
 # =======================================================
 
-####
+# In the summary details, It was found that the variable
+# TotalCharges has some missing values marked as NA
+# Removing 9 such rows from the dataset
+churnData = churnData[complete.cases(churnData), ]
+dim(churnData)      # dimension of the dataset
+
+# Split into Train and Validation sets
+# Training Set : Validation Set = 70 : 30 (random)
 train <- sample(nrow(churnData), 0.7*nrow(churnData), replace = FALSE)
 churnTrain <- churnData[train,]
 churnValid <- churnData[-train,]
-summary(churnTrain)
-defaultTree <- tree(Churn ~ ., data = churnTrain)
-summary(defaultTree)
 
-predData <- predict(defaultTree, churnTrain, type = "class")
-mean(predData == churnTrain$Churn)
+# Dimension of the new split datasets
+dim(churnTrain)
+dim(churnValid)
 
-predData <- predict(defaultTree, churnValid, type = "class")
-mean(predData == churnValid$Churn)
-
-###
 # install.packages("tree")
 library("tree")
-treeFit <- tree(Churn ~ ., data = churnData)
+
+# Creating the default tree model 
+treeFit <- tree(Churn ~ ., data = churnTrain)
 
 # Visualize the tree
 plot(treeFit)
@@ -129,6 +126,16 @@ treeFit
 summary(treeFit)
 
 # Predict using the tree model
+predTrainData <- predict(treeFit, churnTrain, type = "class")
+predValidData <- predict(treeFit, churnValid, type = "class")
+
+# Classification accuracy on Train data
+mean(predTrainData == churnTrain$Churn)
+
+# Classification accuracy on Validation data
+mean(predValidData == churnValid$Churn)
+
+# Predict using the tree model
 predData <- predict(treeFit, churnData, type = "class")
 
 # Confusion matrix
@@ -137,74 +144,13 @@ table(churnData$Churn, predData)
 # Classification accuracy
 mean(predData == churnData$Churn)
 
-
-
-# =======================================================
-# Tree Model : Performance measures for Prediction
-# =======================================================
-
-# Confusion matrix
-cm <- table(churnData$Churn, predData)
-TP <- cm[2,2]  # True Positive (Good predicted as Good)
-TN <- cm[1,1]  # True Negative (Bad predicted as Bad)
-FP <- cm[1,2]  # False Positive (Bad predicted as Good) -- Type I error
-FN <- cm[2,1]  # False Negative (Good predicted as Bad) -- Type II error
-
-# Classification Accuracy
-(TN + TP) / (TN + TP + FN + FP)    # Correct Classification / Total
-mean(predData == churnData$Churn)   # Classification accuracy (alt.)
-
-# False Positive Rate (fpr) / Type I error / 1 - Specificity
-FP / (TN + FP)      # False Positive / Total Negative
-
-# True Positive Rate (tpr) / 1 - Type II error / Sensitivity
-TP / (TP + FN)      # True Positive / Total Positive
-
-# Predict probabilities using the tree model
-probData <- predict(treeFit, churnData, type = "vector")
-
-# Convert probabilities to prediction
-threshold <- 0.4
-
-predData <- rep("No", nrow(churnData))
-predData[probData[,2] > threshold] = "Yes"
-predData <- as.factor(predData)
-
-table(churnData$Churn, predData)
-
-cm <- table(churnData$Churn, predData)
-cm[1,2] / (cm[1,1] + cm[1,2])      # False Positive Rate (fpr)
-cm[2,2] / (cm[2,2] + cm[2,1])      # True Positive Rate (tpr)
-
+# Threshold ?
 
 # =======================================================
-# Part 2 : Random Forests : Aggregating multiple Trees
+# Optimal Cross-Validated Decision Tree
 # =======================================================
 
-# install.packages("randomForest")
-library(randomForest)
-
-# Load the dataset and explore
-churnData <- read.csv("assign2_ChurnData.csv", header = TRUE)
-str(churnData)
-summary(churnData)
-
-
-# -------------------------------------------------------
-# Split into Train and Validation sets
-# Training Set : Validation Set = 70 : 30 (random)
-completeData = churnData[complete.cases(churnData), ]
-
-train <- sample(nrow(completeData), 0.7*nrow(completeData), replace = FALSE)
-churnTrain <- completeData[train,]
-churnValid <- completeData[-train,]
-summary(churnTrain)
-summary(churnValid)
-
-
-# -------------------------------------------------------
-# Start with an optimal but single Tree, just for fun
-# Build a "pruned" Classification Tree over train set
+# Building a "pruned" Classification Tree over train set
 ltreeFit <- tree(Churn ~ ., data = churnTrain, 
                  split = "deviance",
                  method = "recursive.partition",
@@ -213,6 +159,7 @@ ltreeFit <- tree(Churn ~ ., data = churnTrain,
                                         minsize = 2,
                                         mindev = 0))
 plot(ltreeFit)
+# This tree has clearly overfit the training data
 
 cvTree <- cv.tree(ltreeFit, FUN = prune.misclass, K = 10) # K-fold Cross-Validation
 cbind(cvTree$size, cvTree$dev)                            # check cvTree output
@@ -228,35 +175,6 @@ mean(predTrain == churnTrain$Churn)                     # classification accurac
 predValid <- predict(ptreeFit, churnValid, type = "class")  # prediction on validation set
 mean(predValid == churnValid$Churn)                     # classification accuracy
 
-
-# -------------------------------------------------------
-# Now let's aggregate multiple Trees
-# Build a Bagging Model on train set
-
-# Each node can split using all variables
-# That is, each node checks all variables
-# before making the "decision" for split.
-
-bagFit <- randomForest(Churn ~ .,                    # formula
-                       data = churnTrain,                  # data set
-                       ntree = 1000,                      # number of trees
-                       mtry = 20,                         # variables for split
-                       importance = TRUE)                # importance recorded
-bagFit
-
-predTrain <- predict(bagFit, churnTrain, type = "class")   # prediction on train set
-mean(predTrain == churnTrain$Churn)                    # classification accuracy
-predValid <- predict(bagFit, churnValid, type = "class")   # prediction on validation set
-mean(predValid == churnValid$Churn)                    # classification accuracy
-# Did you see the improvement in accuracy?! :-)
-
-# Bagging gives you variable importance for free, depending on the splits
-importance(bagFit)        # importance of the variables in the model (values)
-varImpPlot(bagFit)        # importance of the variables in the model (visual)
-
-
-# -------------------------------------------------------
-# Let's aggregate multiple Trees, randomly
 # Build a Random Forest Model on train set
 
 # Each node splits with subset of features
@@ -265,8 +183,8 @@ varImpPlot(bagFit)        # importance of the variables in the model (visual)
 
 rfFit <- randomForest(Churn ~ .,                     # formula
                       data = churnTrain,                   # data set
-                      ntree = 600,                       # number of trees
-                      mtry = 4,                          # variables for split
+                      ntree = 100,                       # number of trees
+                      mtry = 3,                          # variables for split
                       importance = TRUE)                 # importance recorded                 
 rfFit
 
@@ -282,3 +200,4 @@ varImpPlot(rfFit)         # importance of the variables in the model (visual)
 
 # Cross validated 
 # Random forest
+
