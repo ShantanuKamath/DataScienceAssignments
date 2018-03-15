@@ -375,3 +375,4 @@ importance(rfFit)         # importance of the variables in the model (values)
 # As they were the variables found to be least important.
 # The importance can be visualised on the graph below
 varImpPlot(rfFit)         # importance of the variables in the model (visual)
+
