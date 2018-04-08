@@ -82,7 +82,7 @@ hiercFit <- hclust(dist(cuisDF, method = "euclidean"),    # choice of distance
 hiercFit
 plot(hiercFit, main="Minimum Variance", xlab="", ylab="", sub="", cex =.5)
 
-K <- 7
+K <- 2
 rect.hclust(hiercFit, k = K)
 
 kMin <- 1

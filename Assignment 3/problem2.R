@@ -44,4 +44,27 @@ tempData <- mice(respData,m=5,maxit=50,meth='pmm',seed=500)
 summary(tempData)
 tempData1 <- complete(tempData)
 # write.csv(tempData1, file = "My50ImputedData.csv")
+myPal <- c("red","blue","darkgreen","magenta","darkgrey","black")
+
+hiercFit <- hclust(dist(tempData1, method = "euclidean"),    # choice of distance
+                   method="ward.D")                         # choice of linkage
+hiercFit
+plot(hiercFit, main="Minimum Variance", xlab="", ylab="", sub="", cex =.5)
+
+kMin <- 1
+kMax <- 20
+withinSS <- double(kMax - kMin + 1)
+betweenSS <- double(kMax - kMin + 1)
+
+for (K in kMin:kMax) {
+  kMeansFit <- kmeans(tempData1, centers = K, nstart = 20)
+  withinSS[K] <- sum(kMeansFit$withinss)
+  betweenSS[K] <- kMeansFit$betweenss
+}
+str(tempData1, list.len=ncol(tempData1))
+sapply(tempData1, class)
+
+plot(kMin:kMax, betweenSS, pch=19, type="b", col="red",
+     xlab = "Value of K", ylab = "Sum of Squares (Within and Between)")
+points(kMin:kMax, withinSS, pch=19, type="b", col="green")
 
