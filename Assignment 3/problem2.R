@@ -43,6 +43,9 @@ aggr_plot <- aggr(respData, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE
 tempData <- mice(respData,m=5,maxit=50,meth='pmm',seed=500)
 summary(tempData)
 tempData1 <- complete(tempData)
+indx <- sapply(tempData1, is.factor)
+tempData1[indx] <- lapply(tempData1[indx], function(x) as.numeric(as.factor(x)))
+
 # write.csv(tempData1, file = "My50ImputedData.csv")
 myPal <- c("red","blue","darkgreen","magenta","darkgrey","black")
 
